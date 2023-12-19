@@ -36,12 +36,29 @@ jobs:
           images: |
             name=ghcr.io/${{ github.repository }}
 
-      - name: Clone Kubernetes
+      - name: Checkout Kubernetes
         uses: actions/checkout@v4
         with:
           repository: kubernetes/kubernetes
           path: kubernetes
 
-      - name: Check files
+      - name: Checkout Kind
+        uses: actions/checkout@v4
+        with:
+          repository: kubernetes-sigs/kind
+          path: kind
+
+      - name: Debug
         run: |
-          ls -al
+          tree -d
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: kind/images/base
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            GO_VERSION=1.21
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
