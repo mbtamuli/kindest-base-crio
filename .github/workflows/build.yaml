@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker:
+  build-kindest-base-crio:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -29,13 +29,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            name=ghcr.io/${{ github.repository }}
-
       - name: Checkout Kubernetes
         uses: actions/checkout@v4
         with:
@@ -52,7 +45,7 @@ jobs:
         run: |
           tree -d -L 2
 
-      - name: Build and push
+      - name: Build and push base image
         uses: docker/build-push-action@v5
         with:
           context: kind/images/base
@@ -60,5 +53,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             GO_VERSION=1.20.4
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/${{ github.repository }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push node image
+        run: |
+          echo "Arch: $(uname -m)"
+          echo "Base Image Tag: ${{ steps.meta.outputs.tags }}"
