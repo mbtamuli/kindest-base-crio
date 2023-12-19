@@ -14,7 +14,7 @@ jobs:
           path: kindest-base-crio
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: '1.20.4'
 
@@ -89,7 +89,10 @@ jobs:
           curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           chmod +x ./kind-bin
           sudo mv ./kind-bin /usr/local/bin/kind
-          GOPATH=${GITHUB_WORKSPACE} kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} ${GOPATH}/src/k8s.io/kubernetes --verbosity 10
+          export GOPATH=${GITHUB_WORKSPACE}
+          ls -al ${GOPATH}/src/k8s.io/kubernetes
+          readlink -f ${GOPATH}/src/k8s.io/kubernetes
+          kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} ${GOPATH}/src/k8s.io/kubernetes --verbosity 10
           docker image ls
 
 
