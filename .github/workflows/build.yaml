@@ -84,8 +84,8 @@ jobs:
           curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           chmod +x ./kind-bin
           sudo mv ./kind-bin /usr/local/bin/kind
-          mv kubernetes ${GOPATH}/src/k8s.io/kubernetes
-          kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} ${GOPATH}/src/k8s.io/kubernetes --verbosity 10
+          mv kubernetes $(go env GOPATH)/src/k8s.io/kubernetes
+          kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} $(go env GOPATH)/src/k8s.io/kubernetes --verbosity 10
           docker image ls
 
 
