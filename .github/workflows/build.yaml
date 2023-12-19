@@ -87,7 +87,9 @@ jobs:
           echo "Kind Version"
           kind version
           echo "END Kind Version"
+          pwd
           ls -al
+          readlink -f kubernetes
           cd kubernetes
           ls -al
           cd ..
