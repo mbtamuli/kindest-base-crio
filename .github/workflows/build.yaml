@@ -85,11 +85,11 @@ jobs:
           echo "Node Image Tag: ${{ steps.meta-node.outputs.tags }}"
           docker image ls
           # For AMD64 / x86_64
-          [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          [ $(uname -m) = x86_64 ] && curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           # For ARM64
-          [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-arm64
-          chmod +x ./kind
-          sudo mv ./kind /usr/local/bin/kind
+          [ $(uname -m) = aarch64 ] && curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-arm64
+          chmod +x ./kind-bin
+          sudo mv ./kind-bin /usr/local/bin/kind
           kind build node-image --arch $(uname -m) --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }}
           docker image ls
 
