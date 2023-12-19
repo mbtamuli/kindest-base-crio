@@ -88,7 +88,11 @@ jobs:
           kind version
           echo "END Kind Version"
           ls -al
-          kind build node-image --arch $(uname -m) --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} kubernetes
+          cd kubernetes
+          ls -al
+          cd ..
+          pwd
+          kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} kubernetes
           docker image ls
 
 
