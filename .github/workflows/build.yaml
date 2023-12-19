@@ -78,6 +78,9 @@ jobs:
         run: |
           echo "Base Image Tag: ${{ steps.meta-node.outputs.tags }}"
           echo "Node Image Tag: ${{ steps.meta-node.outputs.tags }}"
+          go version
+          go env
+          env | grep GO
           curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           chmod +x ./kind-bin
           sudo mv ./kind-bin /usr/local/bin/kind
