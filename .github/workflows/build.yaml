@@ -49,10 +49,6 @@ jobs:
           repository: kubernetes-sigs/kind
           path: kind
 
-      - name: Debug
-        run: |
-          tree -d -L 2
-
       - name: Extract metadata (tags, labels) for Base image
         id: meta-base
         uses: docker/metadata-action@v5
@@ -83,11 +79,15 @@ jobs:
           echo "Arch: $(uname -m)"
           echo "Base Image Tag: ${{ steps.meta-node.outputs.tags }}"
           echo "Node Image Tag: ${{ steps.meta-node.outputs.tags }}"
+          echo "$PATH"
           docker image ls
           curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           chmod +x ./kind-bin
           sudo mv ./kind-bin /usr/local/bin/kind
+          echo "Kind Version"
           kind version
+          echo "END Kind Version"
+          ls -al
           kind build node-image --arch $(uname -m) --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} kubernetes
           docker image ls
 
