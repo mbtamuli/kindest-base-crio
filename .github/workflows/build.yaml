@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-kindest-base-crio:
+  build-kindest-crio-images:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -53,6 +53,12 @@ jobs:
         run: |
           tree -d -L 2
 
+      - name: Extract metadata (tags, labels) for Base image
+        id: meta-base
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+
       - name: Build and push base image
         uses: docker/build-push-action@v5
         with:
@@ -61,14 +67,22 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             GO_VERSION=1.20.4
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ${{ steps.meta-base.outputs.tags }}
+          labels: ${{ steps.meta-base.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Extract metadata (tags, labels) for Node image
+        id: meta-node
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/kindest-node-crio
 
       - name: Build and push node image
         run: |
           echo "Arch: $(uname -m)"
-          echo "Base Image Tag: ${{ steps.meta.outputs.tags }}"
+          echo "Base Image Tag: ${{ steps.meta-node.outputs.tags }}"
+          echo "Base Image Labels: ${{ steps.meta-node.outputs.labels }}"
 
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
