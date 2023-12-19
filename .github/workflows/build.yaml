@@ -50,7 +50,7 @@ jobs:
 
       - name: Debug
         run: |
-          tree -d
+          tree -d -L 2
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -59,6 +59,6 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           build-args: |
-            GO_VERSION=1.21
+            GO_VERSION=1.20.4
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
