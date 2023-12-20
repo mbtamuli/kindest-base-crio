@@ -6,28 +6,9 @@ ARG CRIO_VERSION="v1.25.2"
 FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
 
 RUN DEBIAN_FRONTEND=noninteractive clean-install \
+        containers-common \
+        cri-o-runc \
         make
-
-#RUN DEBIAN_FRONTEND=noninteractive clean-install \
-#        containers-common \
-#        cri-o-runc \
-#        gcc \
-#        git \
-#        go-md2man \
-#        libassuan-dev \
-#        libbtrfs-dev \
-#        libc6-dev \
-#        libdevmapper-dev \
-#        libglib2.0-dev \
-#        libgpg-error-dev \
-#        libgpgme-dev \
-#        libseccomp-dev \
-#        libselinux1-dev \
-#        libsystemd-dev \
-#        libudev-dev \
-#        make \
-#        pkg-config \
-#        software-properties-common
 
 ARG BUILDARCH
 ARG CRIO_VERSION
@@ -40,3 +21,10 @@ RUN echo "Installing cri-o ..." \
     && tar -C /tmp -xzvf /tmp/crio.${BUILDARCH}.tgz \
     && (cd /tmp/cri-o && make install)\
     && rm -rf /tmp/cri-o /tmp/crio.${BUILDARCH}.tgz
+
+RUN echo "Setup cri-o" \
+    && ln -s /usr/libexec/podman/conmon /usr/local/bin/conmon \
+    && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio/crio.conf \
+    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
+    && systemctl disable containerd \
+    && systemctl enable crio
