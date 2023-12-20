@@ -13,10 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'ci skip')"
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Create multi node cluster
         run: |
-          kind version
-          echo $PATH
           kind create cluster -v7 --wait 1m --retain --config=kind-config-crio.yaml --image=ghcr.io/${{ github.repository }}
 
       - name: Get Cluster status
