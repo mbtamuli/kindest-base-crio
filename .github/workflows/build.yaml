@@ -49,6 +49,7 @@ jobs:
           path: src/k8s.io/kubernetes/
           fetch-tags: true
           ref: v1.27.8
+          filter: 'blob:none'
 
       - name: Checkout Kind
         uses: actions/checkout@v4
@@ -85,17 +86,11 @@ jobs:
         run: |
           echo "Base Image Tag: ${{ steps.meta-node.outputs.tags }}"
           echo "Node Image Tag: ${{ steps.meta-node.outputs.tags }}"
-          go version
-          go env
-          env | grep GO
           curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           chmod +x ./kind-bin
           sudo mv ./kind-bin /usr/local/bin/kind
-          export GOPATH=${GITHUB_WORKSPACE}
-          ls -al ${GOPATH}/src/k8s.io/kubernetes
-          readlink -f ${GOPATH}/src/k8s.io/kubernetes
+          sudo apt update && sudo apt install build-essential jq -y
           kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} ${GOPATH}/src/k8s.io/kubernetes --verbosity 10
-          docker image ls
 
 
       - # Temp fix
