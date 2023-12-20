@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: "kindest/node"
-  VERSION: "v1.25.11@sha256:227fa11ce74ea76a0474eeefb84cb75d8dad1b08638371ecf0e86259b35be0c8"
-  OS: "xUbuntu_22.04"
+  KINDEST_IMAGE: "kindest/node"
+  KINDEST_VERSION: "v1.25.11@sha256:227fa11ce74ea76a0474eeefb84cb75d8dad1b08638371ecf0e86259b35be0c8"
+  CRIO_VERSION: "v1.25.2"
 
 jobs:
   build-kindest-crio-images:
@@ -56,7 +56,7 @@ jobs:
               VERSION=${{ env.VERSION }}
               OS=${{ env.OS }}
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
