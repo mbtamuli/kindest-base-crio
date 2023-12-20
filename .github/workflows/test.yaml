@@ -18,7 +18,7 @@ jobs:
 
       - name: Create multi node cluster
         run: |
-          kind create cluster -v7 --wait 1m --retain --config=kind-config-crio.yaml --image=ghcr.io/${{ github.repository }}
+          kind create cluster -v7 --wait 1m --retain --config=kind-config-crio.yaml --image=ghcr.io/${{ github.repository }}:main
 
       - name: Get Cluster status
         run: |
