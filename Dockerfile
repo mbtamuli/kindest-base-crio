@@ -24,7 +24,7 @@ RUN echo "Installing Packages ..." \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get --option=Dpkg::Options::=--force-confdef install -y cri-o cri-o-runc \
     && ln -s /usr/libexec/podman/conmon /usr/local/bin/conmon \
-    && sed -i 's/^pause_image =.*/pause_image = \"k8s.gcr.io\/pause:3.2\"/' /etc/crio/crio.conf \
+    && sed -i 's/^pause_image =.*/pause_image = \"registry.k8s.io\/pause:3.7\"/' /etc/crio/crio.conf \
     && sed -i 's/.*storage_driver.*/storage_driver = \"vfs\"/' /etc/crio/crio.conf \
     && sed -i 's/^cgroup_manager =.*/cgroup_manager = \"cgroupfs\"/' /etc/crio/crio.conf \
     && sed -i 's/^cgroup_manager =.*/a conmon_cgroup = \"pod\"/' /etc/crio/crio.conf \
