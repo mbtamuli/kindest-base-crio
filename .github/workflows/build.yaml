@@ -4,6 +4,11 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  IMAGE: "kindest/node"
+  VERSION: "v1.25.11@sha256:227fa11ce74ea76a0474eeefb84cb75d8dad1b08638371ecf0e86259b35be0c8"
+  OS: "xUbuntu_22.04"
+
 jobs:
   build-kindest-crio-images:
     runs-on: ubuntu-latest
@@ -46,12 +51,17 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+              IMAGE=${{ env.IMAGE }}
+              VERSION=${{ env.VERSION }}
+              OS=${{ env.OS }}
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
 
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
