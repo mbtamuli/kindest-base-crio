@@ -90,6 +90,7 @@ jobs:
           chmod +x ./kind-bin
           sudo mv ./kind-bin /usr/local/bin/kind
           sudo apt update && sudo apt install build-essential jq -y
+          export GOPATH=${GITHUB_WORKSPACE}
           kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} ${GOPATH}/src/k8s.io/kubernetes --verbosity 10
 
 
