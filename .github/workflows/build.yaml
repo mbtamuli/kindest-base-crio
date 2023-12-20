@@ -10,13 +10,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          path: kindest-base-crio
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.20.4'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -42,23 +35,8 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout Kubernetes
-        uses: actions/checkout@v4
-        with:
-          repository: kubernetes/kubernetes
-          path: src/k8s.io/kubernetes/
-          fetch-tags: true
-          ref: v1.27.8
-          filter: 'blob:none'
-
-      - name: Checkout Kind
-        uses: actions/checkout@v4
-        with:
-          repository: kubernetes-sigs/kind
-          path: kind
-
       - name: Extract metadata (tags, labels) for Base image
-        id: meta-base
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
@@ -69,30 +47,10 @@ jobs:
           context: kind/images/base
           push: true
           platforms: linux/amd64,linux/arm64
-          build-args: |
-            GO_VERSION=1.20.4
-          tags: ${{ steps.meta-base.outputs.tags }}
-          labels: ${{ steps.meta-base.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-
-      - name: Extract metadata (tags, labels) for Node image
-        id: meta-node
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/kindest-node-crio
-
-      - name: Build and push node image
-        run: |
-          echo "Base Image Tag: ${{ steps.meta-node.outputs.tags }}"
-          echo "Node Image Tag: ${{ steps.meta-node.outputs.tags }}"
-          curl -Lo ./kind-bin https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-          chmod +x ./kind-bin
-          sudo mv ./kind-bin /usr/local/bin/kind
-          sudo apt update && sudo apt install build-essential jq -y
-          export GOPATH=${GITHUB_WORKSPACE}
-          kind build node-image --arch amd64 --base-image ${{ steps.meta-base.outputs.tags }} --image ${{ steps.meta-node.outputs.tags }} ${GOPATH}/src/k8s.io --verbosity 10
-
 
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
