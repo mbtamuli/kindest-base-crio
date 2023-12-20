@@ -5,6 +5,9 @@ ARG CRIO_VERSION="v1.25.2"
 
 FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
 
+RUN DEBIAN_FRONTEND=noninteractive clean-install \
+        make
+
 #RUN DEBIAN_FRONTEND=noninteractive clean-install \
 #        containers-common \
 #        cri-o-runc \
