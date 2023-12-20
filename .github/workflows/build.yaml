@@ -47,6 +47,8 @@ jobs:
         with:
           repository: kubernetes/kubernetes
           path: src/k8s.io/kubernetes/
+          fetch-tags: true
+          ref: v1.27.8
 
       - name: Checkout Kind
         uses: actions/checkout@v4
