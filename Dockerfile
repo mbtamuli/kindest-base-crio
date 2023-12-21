@@ -11,16 +11,25 @@ RUN DEBIAN_FRONTEND=noninteractive clean-install \
         file \
         make
 
-ARG BUILDARCH
+ARG TARGETARCH
 ARG CRIO_VERSION
-ARG CRIO_TARBALL="cri-o.${BUILDARCH}.${CRIO_VERSION}.tar.gz"
+ARG CRIO_TARBALL="cri-o.${TARGETARCH}.${CRIO_VERSION}.tar.gz"
 ARG CRIO_URL="https://github.com/cri-o/cri-o/releases/download/${CRIO_VERSION}/${CRIO_TARBALL}"
 
 RUN echo "Installing cri-o ..." \
-    && curl -sSL --retry 5 --output /root/crio.${BUILDARCH}.tgz "${CRIO_URL}" \
-    && tar -C /root -xzvf /root/crio.${BUILDARCH}.tgz \
+    && curl -sSL --retry 5 --output /root/crio.${TARGETARCH}.tgz "${CRIO_URL}" \
+    && tar -C /root -xzvf /root/crio.${TARGETARCH}.tgz \
     && (cd /root/cri-o && make all)\
-    && rm -rf /root/cri-o /root/crio.${BUILDARCH}.tgz
+    && rm -rf /root/cri-o /root/crio.${TARGETARCH}.tgz
+
+ARG FUSE_OVERLAYFS_VERSION="1.9"
+ARG FUSE_OVERLAYFS_TARBALL="v${FUSE_OVERLAYFS_VERSION}/fuse-overlayfs-${TARGETARCH}"
+ARG FUSE_OVERLAYFS_URL="https://github.com/containers/fuse-overlayfs/releases/download/${FUSE_OVERLAYFS_TARBALL}"
+
+RUN echo "Installing fuse-overlayfs ..." \
+    && curl -sSL --retry 5 --output /tmp/fuse-overlayfs.${TARGETARCH} "${FUSE_OVERLAYFS_URL}" \
+    && mv -f /tmp/fuse-overlayfs.${TARGETARCH} /usr/local/bin/fuse-overlayfs \
+    && chmod +x /usr/local/bin/fuse-overlayfs
 
 RUN echo "list files in /usr/local/bin/" \
     && ls -al /usr/local/bin/ \
