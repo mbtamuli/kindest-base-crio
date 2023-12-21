@@ -29,4 +29,5 @@ RUN echo "Setup cri-o" \
     && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
     && systemctl disable containerd \
     && ln -s /etc/contrib/crio.service /etc/systemd/system/crio.service \
+    && systemctl daemon-reload \
     && systemctl enable crio
