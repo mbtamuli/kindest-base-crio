@@ -8,6 +8,7 @@ FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
 ARG OS
 
 RUN DEBIAN_FRONTEND=noninteractive clean-install \
+        file \
         make
 
 ARG BUILDARCH
@@ -21,6 +22,11 @@ RUN echo "Installing cri-o ..." \
     && (cd /root/cri-o && make all)\
     && rm -rf /root/cri-o /root/crio.${BUILDARCH}.tgz
 
+RUN echo "list files in /usr/local/bin/" \
+    && ls -al /usr/local/bin/ \
+    && file /usr/local/bin/ctr
+
+
 COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
 # all configs are 0644 (rw- r-- r--)
 COPY --chmod=0644 files/etc/* /etc/
@@ -33,9 +39,15 @@ COPY --chmod=0644 files/etc/systemd/system/* /etc/systemd/system/
 COPY --chmod=0644 files/etc/systemd/system/kubelet.service.d/* /etc/systemd/system/kubelet.service.d/
 COPY --chmod=0644 files/var/lib/kubelet/* /var/lib/kubelet/
 
+RUN echo "list files in /usr/local/bin/" \
+    && ls -al /usr/local/bin/ \
+    && file /usr/local/bin/ctr
+
 RUN echo "Setup cri-o" \
     && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
+    && cat /etc/crio.conf && echo \
     && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
+    && cat /etc/crictl.yaml && echo \
     && systemctl disable containerd \
     && ln -s /etc/contrib/crio.service /etc/systemd/system/crio.service \
     && ln -s /etc/systemd/system/crio.service /etc/systemd/system/multi-user.target.wants/crio.service
