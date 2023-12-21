@@ -7,6 +7,8 @@ ARG OS="Debian_11"
 FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
 ARG OS
 
+COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
+
 RUN DEBIAN_FRONTEND=noninteractive clean-install \
         file \
         make
@@ -22,6 +24,12 @@ RUN echo "Installing cri-o ..." \
     && (cd /root/cri-o && make all)\
     && rm -rf /root/cri-o /root/crio.${TARGETARCH}.tgz
 
+RUN echo "Setup cri-o" \
+    && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
+    && cat /etc/crio.conf && echo \
+    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
+    && cat /etc/crictl.yaml && echo \
+
 ARG FUSE_OVERLAYFS_VERSION="1.9"
 ARG FUSE_OVERLAYFS_TARBALL="v${FUSE_OVERLAYFS_VERSION}/fuse-overlayfs-${TARGETARCH}"
 ARG FUSE_OVERLAYFS_URL="https://github.com/containers/fuse-overlayfs/releases/download/${FUSE_OVERLAYFS_TARBALL}"
@@ -35,28 +43,12 @@ RUN echo "list files in /usr/local/bin/" \
     && ls -al /usr/local/bin/ \
     && file /usr/local/bin/ctr
 
-
-COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
 # all configs are 0644 (rw- r-- r--)
 COPY --chmod=0644 files/etc/* /etc/
-# Keep containerd configuration to support kind build
-COPY --chmod=0644 files/etc/cni/net.d/* /etc/cni/net.d/
-COPY --chmod=0644 files/etc/crio/* /etc/crio/
-COPY --chmod=0644 files/etc/default/* /etc/default/
-COPY --chmod=0644 files/etc/sysctl.d/* /etc/sysctl.d/
-COPY --chmod=0644 files/etc/systemd/system/* /etc/systemd/system/
-COPY --chmod=0644 files/etc/systemd/system/kubelet.service.d/* /etc/systemd/system/kubelet.service.d/
-COPY --chmod=0644 files/var/lib/kubelet/* /var/lib/kubelet/
 
 RUN echo "list files in /usr/local/bin/" \
     && ls -al /usr/local/bin/ \
     && file /usr/local/bin/ctr
 
-RUN echo "Setup cri-o" \
-    && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
-    && cat /etc/crio.conf && echo \
-    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
-    && cat /etc/crictl.yaml && echo \
-    && systemctl disable containerd \
-    && ln -s /etc/contrib/crio.service /etc/systemd/system/crio.service \
-    && ln -s /etc/systemd/system/crio.service /etc/systemd/system/multi-user.target.wants/crio.service
+RUN systemctl disable containerd \
+    && systemctl enable crio
