@@ -9,7 +9,9 @@ FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
 ARG OS
 
 RUN DEBIAN_FRONTEND=noninteractive clean-install \
-        make
+        dbus \
+        make \
+        && systemctl enable dbus
 
 ARG BUILDARCH
 ARG CRIO_VERSION
