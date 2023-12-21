@@ -21,14 +21,13 @@ ARG CRIO_URL="https://github.com/cri-o/cri-o/releases/download/${CRIO_VERSION}/$
 RUN echo "Installing cri-o ..." \
     && curl -sSL --retry 5 --output /root/crio.${TARGETARCH}.tgz "${CRIO_URL}" \
     && tar -C /root -xzvf /root/crio.${TARGETARCH}.tgz \
-    && (cd /root/cri-o && make all)\
+    && cd /root/cri-o && make all \
     && rm -rf /root/cri-o /root/crio.${TARGETARCH}.tgz
 
 RUN echo "Setup cri-o" \
-    && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
     && cat /etc/crio.conf && echo \
     && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
-    && cat /etc/crictl.yaml && echo \
+    && cat /etc/crictl.yaml && echo
 
 ARG FUSE_OVERLAYFS_VERSION="1.9"
 ARG FUSE_OVERLAYFS_TARBALL="v${FUSE_OVERLAYFS_VERSION}/fuse-overlayfs-${TARGETARCH}"
