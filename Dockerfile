@@ -5,22 +5,27 @@ ARG CRIO_VERSION="v1.25.2"
 ARG OS="Debian_11"
 
 FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
-
 ARG OS
 
-RUN DEBIAN_FRONTEND=noninteractive clean-install \
-        dbus \
-        make \
-        && systemctl enable dbus
+COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
+# all configs are 0644 (rw- r-- r--)
+COPY --chmod=0644 files/etc/* /etc/
+# Keep containerd configuration to support kind build
+COPY --chmod=0644 files/etc/cni/net.d/* /etc/cni/net.d/
+COPY --chmod=0644 files/etc/crio/* /etc/crio/
+COPY --chmod=0644 files/etc/default/* /etc/default/
+COPY --chmod=0644 files/etc/sysctl.d/* /etc/sysctl.d/
+COPY --chmod=0644 files/etc/systemd/system/* /etc/systemd/system/
+COPY --chmod=0644 files/etc/systemd/system/kubelet.service.d/* /etc/systemd/system/kubelet.service.d/
+COPY --chmod=0644 files/var/lib/kubelet/* /var/lib/kubelet/
 
-ENV container docker
-STOPSIGNAL SIGRTMIN+3
+RUN DEBIAN_FRONTEND=noninteractive clean-install \
+        make
 
 ARG BUILDARCH
 ARG CRIO_VERSION
 ARG CRIO_TARBALL="cri-o.${BUILDARCH}.${CRIO_VERSION}.tar.gz"
 ARG CRIO_URL="https://github.com/cri-o/cri-o/releases/download/${CRIO_VERSION}/${CRIO_TARBALL}"
-
 
 RUN echo "Installing cri-o ..." \
     && curl -sSL --retry 5 --output /tmp/crio.${BUILDARCH}.tgz "${CRIO_URL}" \
@@ -29,7 +34,6 @@ RUN echo "Installing cri-o ..." \
     && rm -rf /tmp/cri-o /tmp/crio.${BUILDARCH}.tgz
 
 RUN echo "Setup cri-o" \
-    #&& ln -s /usr/libexec/podman/conmon /usr/local/bin/conmon \
     && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
     && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
     && systemctl disable containerd \
