@@ -16,10 +16,10 @@ ARG CRIO_TARBALL="cri-o.${BUILDARCH}.${CRIO_VERSION}.tar.gz"
 ARG CRIO_URL="https://github.com/cri-o/cri-o/releases/download/${CRIO_VERSION}/${CRIO_TARBALL}"
 
 RUN echo "Installing cri-o ..." \
-    && curl -sSL --retry 5 --output /tmp/crio.${BUILDARCH}.tgz "${CRIO_URL}" \
-    && tar -C /tmp -xzvf /tmp/crio.${BUILDARCH}.tgz \
-    && (cd /tmp/cri-o && make install)\
-    && rm -rf /tmp/cri-o /tmp/crio.${BUILDARCH}.tgz
+    && curl -sSL --retry 5 --output /root/crio.${BUILDARCH}.tgz "${CRIO_URL}" \
+    && tar -C /root -xzvf /root/crio.${BUILDARCH}.tgz \
+    && (cd /root/cri-o && make all)\
+    && rm -rf /root/cri-o /root/crio.${BUILDARCH}.tgz
 
 COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
 # all configs are 0644 (rw- r-- r--)
