@@ -24,11 +24,6 @@ RUN echo "Installing cri-o ..." \
     && cd /root/cri-o && make all \
     && rm -rf /root/cri-o /root/crio.${TARGETARCH}.tgz
 
-RUN echo "Setup cri-o" \
-    && cat /etc/crio.conf && echo \
-    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
-    && cat /etc/crictl.yaml && echo
-
 ARG FUSE_OVERLAYFS_VERSION="1.9"
 ARG FUSE_OVERLAYFS_TARBALL="v${FUSE_OVERLAYFS_VERSION}/fuse-overlayfs-${TARGETARCH}"
 ARG FUSE_OVERLAYFS_URL="https://github.com/containers/fuse-overlayfs/releases/download/${FUSE_OVERLAYFS_TARBALL}"
@@ -44,6 +39,11 @@ RUN echo "list files in /usr/local/bin/" \
 
 # all configs are 0644 (rw- r-- r--)
 COPY --chmod=0644 files/etc/* /etc/
+
+RUN echo "Setup cri-o" \
+    && cat /etc/crio.conf && echo \
+    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
+    && cat /etc/crictl.yaml && echo
 
 RUN echo "list files in /usr/local/bin/" \
     && ls -al /usr/local/bin/ \
