@@ -49,21 +49,21 @@ RUN echo "Installing fuse-overlayfs ..." \
     && mv -f /tmp/fuse-overlayfs.${TARGETARCH} /usr/local/bin/fuse-overlayfs \
     && chmod +x /usr/local/bin/fuse-overlayfs
 
-RUN echo "list files in /usr/local/bin/" \
-    && ls -al /usr/local/bin/ \
-    && file /usr/local/bin/ctr
+#RUN echo "list files in /usr/local/bin/" \
+#    && ls -al /usr/local/bin/ \
+#    && file /usr/local/bin/ctr
 
-# all configs are 0644 (rw- r-- r--)
-COPY --chmod=0644 files/etc/* /etc/
+## all configs are 0644 (rw- r-- r--)
+#COPY --chmod=0644 files/etc/* /etc/
 
-RUN echo "Setup cri-o" \
-    && cat /etc/crio.conf && echo \
-    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
-    && cat /etc/crictl.yaml && echo
+#RUN echo "Setup cri-o" \
+#    && cat /etc/crio.conf && echo \
+#    && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
+#    && cat /etc/crictl.yaml && echo
 
-RUN echo "list files in /usr/local/bin/" \
-    && ls -al /usr/local/bin/ \
-    && file /usr/local/bin/ctr
+#RUN echo "list files in /usr/local/bin/" \
+#    && ls -al /usr/local/bin/ \
+#    && file /usr/local/bin/ctr
 
 RUN systemctl disable containerd \
     && systemctl enable crio
