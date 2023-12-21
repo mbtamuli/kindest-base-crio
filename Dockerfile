@@ -27,6 +27,6 @@ RUN echo "Setup cri-o" \
     #&& ln -s /usr/libexec/podman/conmon /usr/local/bin/conmon \
     && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
     && sed -i 's/containerd/crio/g' /etc/crictl.yaml \
-    && systemctl disable containerd
+    && systemctl disable containerd \
     && ln -s /etc/contrib/crio.service /etc/systemd/system/crio.service \
     && systemctl enable crio
