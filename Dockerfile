@@ -13,6 +13,9 @@ RUN DEBIAN_FRONTEND=noninteractive clean-install \
         make \
         && systemctl enable dbus
 
+ENV container docker
+STOPSIGNAL SIGRTMIN+3
+
 ARG BUILDARCH
 ARG CRIO_VERSION
 ARG CRIO_TARBALL="cri-o.${BUILDARCH}.${CRIO_VERSION}.tar.gz"
