@@ -7,18 +7,6 @@ ARG OS="Debian_11"
 FROM --platform=$BUILDPLATFORM ${KINDEST_IMAGE}:${KINDEST_VERSION}
 ARG OS
 
-COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
-# all configs are 0644 (rw- r-- r--)
-COPY --chmod=0644 files/etc/* /etc/
-# Keep containerd configuration to support kind build
-COPY --chmod=0644 files/etc/cni/net.d/* /etc/cni/net.d/
-COPY --chmod=0644 files/etc/crio/* /etc/crio/
-COPY --chmod=0644 files/etc/default/* /etc/default/
-COPY --chmod=0644 files/etc/sysctl.d/* /etc/sysctl.d/
-COPY --chmod=0644 files/etc/systemd/system/* /etc/systemd/system/
-COPY --chmod=0644 files/etc/systemd/system/kubelet.service.d/* /etc/systemd/system/kubelet.service.d/
-COPY --chmod=0644 files/var/lib/kubelet/* /var/lib/kubelet/
-
 RUN DEBIAN_FRONTEND=noninteractive clean-install \
         make
 
@@ -32,6 +20,18 @@ RUN echo "Installing cri-o ..." \
     && tar -C /tmp -xzvf /tmp/crio.${BUILDARCH}.tgz \
     && (cd /tmp/cri-o && make install)\
     && rm -rf /tmp/cri-o /tmp/crio.${BUILDARCH}.tgz
+
+COPY --chmod=0755 files/usr/local/bin/* /usr/local/bin/
+# all configs are 0644 (rw- r-- r--)
+COPY --chmod=0644 files/etc/* /etc/
+# Keep containerd configuration to support kind build
+COPY --chmod=0644 files/etc/cni/net.d/* /etc/cni/net.d/
+COPY --chmod=0644 files/etc/crio/* /etc/crio/
+COPY --chmod=0644 files/etc/default/* /etc/default/
+COPY --chmod=0644 files/etc/sysctl.d/* /etc/sysctl.d/
+COPY --chmod=0644 files/etc/systemd/system/* /etc/systemd/system/
+COPY --chmod=0644 files/etc/systemd/system/kubelet.service.d/* /etc/systemd/system/kubelet.service.d/
+COPY --chmod=0644 files/var/lib/kubelet/* /var/lib/kubelet/
 
 RUN echo "Setup cri-o" \
     && printf "[crio.runtime]\ncgroup_manager=\"cgroupfs\"\nconmon_cgroup=\"pod\"\n" > /etc/crio.conf \
