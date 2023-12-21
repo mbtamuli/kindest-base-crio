@@ -9,8 +9,6 @@ nodes:
       criSocket: unix:///run/crio/crio.sock
       kubeletExtraArgs:
         cgroup-driver: cgroupfs
-- role: worker
-  kubeadmConfigPatches:
   - |
     kind: JoinConfiguration
     nodeRegistration:
@@ -19,6 +17,26 @@ nodes:
         cgroup-driver: cgroupfs
 - role: worker
   kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      criSocket: unix:///run/crio/crio.sock
+      kubeletExtraArgs:
+        cgroup-driver: cgroupfs
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      criSocket: unix:///run/crio/crio.sock
+      kubeletExtraArgs:
+        cgroup-driver: cgroupfs
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      criSocket: unix:///run/crio/crio.sock
+      kubeletExtraArgs:
+        cgroup-driver: cgroupfs
   - |
     kind: JoinConfiguration
     nodeRegistration:
